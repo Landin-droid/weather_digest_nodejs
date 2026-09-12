@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Просмотр отчёта Weather Digest</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 600px;
+        margin: 40px auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 16px;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Weather Digest — просмотр отчёта</h1>
+    <input type="file" id="fileInput" accept="application/json" />
+    <div id="output"></div>
+
+    <script>
+      document.getElementById("fileInput").addEventListener("change", async event => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const text = await file.text();
+        const report = JSON.parse(text);
+        renderReport(report);
+      });
+
+      function renderReport(report) {
+        const output = document.getElementById("output");
+        output.innerHTML = "";
+
+        const heading = document.createElement("h2");
+        heading.textContent = `${report.city}, ${report.country}`;
+        output.appendChild(heading);
+
+        const table = document.createElement("table");
+        const header = table.insertRow();
+        ["Дата", "Мин, °C", "Макс, °C", "Осадки, мм"].forEach(text => {
+          const th = document.createElement("th");
+          th.textContent = text;
+          header.appendChild(th);
+        });
+
+        report.days.forEach(day => {
+          const row = table.insertRow();
+          [day.date, day.tempMin, day.tempMax, day.precipitation].forEach(value => {
+            const cell = row.insertCell();
+            cell.textContent = value;
+          });
+        });
+
+        output.appendChild(table);
+      }
+    </script>
+  </body>
+</html>
