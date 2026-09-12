@@ -43,7 +43,7 @@ async function main() {
   const { cities, days } = args;
 
   const results = await Promise.allSettled(
-    cities.map((city) => getCityWeather(city, days)),
+    cities.map((city) => getCityWeather(city, days, { noCache: args.noCache })),
   );
 
   let hasErrors = false;
