@@ -25,9 +25,7 @@ export async function fetchJson(url, { timeoutMs = DEFAULT_TIMEOUT_MS } = {}) {
     response = await fetch(url, { signal: controller.signal });
   } catch (err) {
     if (err.name === "AbortError") {
-      throw new TimeoutError(
-        `Превышен таймаут запроса (${timeoutMs} мс): ${url}`,
-      );
+      throw new TimeoutError(`Превышен таймаут запроса (${timeoutMs} мс): ${url}`);
     }
     throw new HttpError(`Сетевая ошибка при запросе: ${url}`, { cause: err });
   } finally {
@@ -36,10 +34,9 @@ export async function fetchJson(url, { timeoutMs = DEFAULT_TIMEOUT_MS } = {}) {
 
   if (!response.ok) {
     const statusType = response.status >= 500 ? "сервера" : "запроса";
-    throw new HttpError(
-      `Ошибка ${statusType} (${response.status}) при запросе: ${url}`,
-      { status: response.status },
-    );
+    throw new HttpError(`Ошибка ${statusType} (${response.status}) при запросе: ${url}`, {
+      status: response.status,
+    });
   }
 
   try {

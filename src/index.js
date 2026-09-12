@@ -12,9 +12,7 @@ function parseCliArgs() {
   });
 
   if (!values.city || values.city.trim() === "") {
-    throw new Error(
-      'Параметр --city обязателен. Пример: --city "Томск, Москва"',
-    );
+    throw new Error('Параметр --city обязателен. Пример: --city "Томск, Москва"');
   }
 
   const days = Number(values.days);
@@ -26,8 +24,8 @@ function parseCliArgs() {
 
   const cities = values.city
     .split(",")
-    .map((c) => c.trim())
-    .filter((c) => c.length > 0);
+    .map(c => c.trim())
+    .filter(c => c.length > 0);
 
   return { cities, days, noCache: values["no-cache"] };
 }
@@ -45,7 +43,7 @@ async function main() {
   const { cities, days, noCache } = args;
 
   const results = await Promise.allSettled(
-    cities.map((city) => getCityWeather(city, days, { noCache })),
+    cities.map(city => getCityWeather(city, days, { noCache })),
   );
 
   let hasErrors = false;
@@ -63,12 +61,12 @@ async function main() {
   process.exitCode = hasErrors ? 1 : 0;
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error(`Непредвиденная ошибка: ${err.message}`);
   process.exitCode = 1;
 });
 
-process.on("unhandledRejection", (reason) => {
+process.on("unhandledRejection", reason => {
   console.error(
     `Необработанная ошибка промиса: ${reason instanceof Error ? reason.message : reason}`,
   );

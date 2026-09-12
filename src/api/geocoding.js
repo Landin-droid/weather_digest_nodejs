@@ -1,8 +1,6 @@
 import { fetchJson } from "./httpClient.js";
 
-const BASE_URL =
-  process.env.GEOCODING_BASE_URL ??
-  "https://geocoding-api.open-meteo.com/v1/search";
+const BASE_URL = process.env.GEOCODING_BASE_URL ?? "https://geocoding-api.open-meteo.com/v1/search";
 
 export class CityNotFoundError extends Error {
   constructor(city) {

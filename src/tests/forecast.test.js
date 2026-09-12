@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { getForecast } from "../api/forecast.js";
 
-test("getForecast корректно разбирает ответ API в массив по дням", async (t) => {
+test("getForecast корректно разбирает ответ API в массив по дням", async t => {
   const mockResponse = {
     daily: {
       time: ["2026-09-13", "2026-09-14"],
