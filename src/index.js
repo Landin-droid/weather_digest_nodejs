@@ -1,5 +1,6 @@
 import { parseArgs } from "node:util";
 import { getCityWeather } from "./services/weatherService.js";
+import { formatCityReport, formatCityError } from "./format/output.js";
 
 function parseCliArgs() {
   const { values } = parseArgs({
@@ -12,14 +13,14 @@ function parseCliArgs() {
 
   if (!values.city || values.city.trim() === "") {
     throw new Error(
-      'Параметр --city обязателен. Пример: --city "Хельсинки,Москва"',
+      'Параметр --city обязателен. Пример: --city "Томск, Москва"',
     );
   }
 
   const days = Number(values.days);
   if (!Number.isInteger(days) || days < 1 || days > 7) {
     throw new Error(
-      `Параметр --days должен быть целым числом от 1 до 7 (получено: ${values.days})`,
+      `Параметр --days должен быть целым числом от 1 до 7 включительно (получено: ${values.days})`,
     );
   }
 
@@ -37,13 +38,14 @@ async function main() {
     args = parseCliArgs();
   } catch (err) {
     console.error(`Ошибка аргументов: ${err.message}`);
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
 
-  const { cities, days } = args;
+  const { cities, days, noCache } = args;
 
   const results = await Promise.allSettled(
-    cities.map((city) => getCityWeather(city, days, { noCache: args.noCache })),
+    cities.map((city) => getCityWeather(city, days, { noCache })),
   );
 
   let hasErrors = false;
@@ -51,16 +53,24 @@ async function main() {
   results.forEach((result, i) => {
     const city = cities[i];
     if (result.status === "fulfilled") {
-      console.log(JSON.stringify(result.value, null, 2)); // временный вывод — заменим на шаге 6
+      console.log(formatCityReport(result.value));
     } else {
       hasErrors = true;
-      console.error(
-        `Ошибка при обработке города "${city}": ${result.reason.message}`,
-      );
+      console.error(formatCityError(city, result.reason));
     }
   });
 
-  process.exit(hasErrors ? 1 : 0);
+  process.exitCode = hasErrors ? 1 : 0;
 }
 
-main();
+main().catch((err) => {
+  console.error(`Непредвиденная ошибка: ${err.message}`);
+  process.exitCode = 1;
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error(
+    `Необработанная ошибка промиса: ${reason instanceof Error ? reason.message : reason}`,
+  );
+  process.exitCode = 1;
+});
