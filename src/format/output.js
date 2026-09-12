@@ -1,9 +1,7 @@
 export function formatCityReport(report) {
   const lines = [];
 
-  lines.push(
-    `\n🚩 ${report.city}, ${report.country} (${report.latitude}, ${report.longitude})`,
-  );
+  lines.push(`\n🚩 ${report.city}, ${report.country} (${report.latitude}, ${report.longitude})`);
   if (report.fromCache) {
     lines.push("   (данные из кэша)");
   }
