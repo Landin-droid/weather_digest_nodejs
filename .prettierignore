@@ -2,7 +2,6 @@
 **/.svn
 **/.hg
 **/node_modules
-**/*.html
 **/*.json
 eslint.config.js
 README.md
