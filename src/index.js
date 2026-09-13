@@ -6,28 +6,32 @@ function parseCliArgs() {
   const { values } = parseArgs({
     options: {
       city: { type: "string" },
-      days: { type: "string", default: "3" },
+      days: { type: "string" },
       "no-cache": { type: "boolean", default: false },
     },
   });
 
-  if (!values.city || values.city.trim() === "") {
-    throw new Error('Параметр --city обязателен. Пример: --city "Томск, Москва"');
-  }
+  const rawCity = values.city ?? process.env.CITY;
+  const rawDays = values.days ?? process.env.DAYS ?? "3";
+  const noCache = values["no-cache"] || process.env.NO_CACHE === "true";
 
-  const days = Number(values.days);
-  if (!Number.isInteger(days) || days < 1 || days > 7) {
+  if (!rawCity || rawCity.trim() === "") {
     throw new Error(
-      `Параметр --days должен быть целым числом от 1 до 7 включительно (получено: ${values.days})`,
+      'Параметр --city обязателен (или переменная окружения CITY). Пример: --city "Томск, Москва"',
     );
   }
 
-  const cities = values.city
+  const days = Number(rawDays);
+  if (!Number.isInteger(days) || days < 1 || days > 7) {
+    throw new Error(`Параметр --days должен быть целым числом от 1 до 7 включительно (получено: ${rawDays})`);
+  }
+
+  const cities = rawCity
     .split(",")
     .map(c => c.trim())
     .filter(c => c.length > 0);
 
-  return { cities, days, noCache: values["no-cache"] };
+  return { cities, days, noCache };
 }
 
 async function main() {
